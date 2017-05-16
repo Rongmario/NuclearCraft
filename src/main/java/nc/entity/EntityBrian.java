@@ -1,6 +1,7 @@
 package nc.entity;
 
 import nc.item.NCItems;
+import nc.NuclearCraft;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIAttackOnCollide;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;

@@ -300,6 +300,8 @@ public class NuclearCraft {
 	public static boolean workspaceShiftClick;
 	public static boolean nonTECoolerRecipes;
 	
+	public static boolean boiledEggRecipe;
+	
 	public static int EMUpdateRate;
 	public static int fissionUpdateRate;
 	public static int fissionComparatorHeat;
@@ -658,6 +660,8 @@ public class NuclearCraft {
 	public static Fluid denseSteam;
 	public static Fluid superdenseSteam;
 	
+	public static int brianDamage;
+	
 	@SidedProxy(clientSide = "nc.proxy.ClientProxy", serverSide = "nc.proxy.CommonProxy")
 	public static CommonProxy NCProxy;
 	
@@ -693,120 +697,133 @@ public class NuclearCraft {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {	
 		//config
-		Configuration config = new Configuration(new File("config/NuclearCraft/NCConfig.cfg"));
+		Configuration mainConfig = new Configuration(new File("config/NuclearCraft/NCConfig.cfg"));
 		Configuration fissionConfig = new Configuration(new File("config/NuclearCraft/FissionConfig.cfg"));
 		Configuration fusionConfig = new Configuration(new File("config/NuclearCraft/FusionConfig.cfg"));
 		Configuration acceleratorConfig = new Configuration(new File("config/NuclearCraft/AcceleratorConfig.cfg"));
 		Configuration toolConfig = new Configuration(new File("config/NuclearCraft/ToolConfig.cfg"));
-		config.load();
+		Configuration mobConfig = new Configuration(new File("config/NuclearCraft/MobConfig.cfg"));
+		
+		mainConfig.load();
 		fissionConfig.load();
 		fusionConfig.load();
 		acceleratorConfig.load();
 		toolConfig.load();
+		mobConfig.load();
 		
-		workspace = config.getBoolean("If disabled, all crafting recipes will be vanilla crafting table recipes, and the Heavy Duty Workspace will be disabled", "!: Enable Heavy Duty Workspace", true, "");
-		workspaceShiftClick = config.getBoolean("If enabled, shift clicking items in the Heavy Duty Workspace will move items into the crafting grid", "!: Enable Shift Click into Workspace Grid", false, "");
-		nonTECoolerRecipes = config.getBoolean("Enable the vanilla crafting recipes for the advanced reactor coolers EVEN IF Thermal Expansion is not installed", "!: Force Vanilla Crafting of Coolers", false, "");
+		workspace = mainConfig.getBoolean("If disabled, all crafting recipes will be vanilla crafting table recipes, and the Heavy Duty Workspace will be disabled", "!: Enable Heavy Duty Workspace", true, "");
+		workspaceShiftClick = mainConfig.getBoolean("If enabled, shift clicking items in the Heavy Duty Workspace will move items into the crafting grid", "!: Enable Shift Click into Workspace Grid", false, "");
+		nonTECoolerRecipes = mainConfig.getBoolean("Enable the vanilla crafting recipes for the advanced reactor coolers EVEN IF Thermal Expansion is not installed", "!: Force Vanilla Crafting of Coolers", false, "");
 		
-		oreGenCopper = config.getBoolean("Generation", "0.0: Copper Ore", true, "");
-		oreSizeCopper = config.getInt("Chunk Size", "0.0: Copper Ore", 8, 1, 100, "");
-		oreRarityCopper = config.getInt("Gen Rate", "0.0: Copper Ore", 12, 1, 100, "");
-		oreMaxHeightCopper = config.getInt("Max Height", "0.0: Copper Ore", 60, 1, 255, "");
-		oreGenTin = config.getBoolean("Generation", "0.1: Tin Ore", true, "");
-		oreSizeTin = config.getInt("Chunk Size", "0.1: Tin Ore", 8, 1, 100, "");
-		oreRarityTin = config.getInt("Gen Rate", "0.1: Tin Ore", 11, 1, 100, "");
-		oreMaxHeightTin = config.getInt("Max Height", "0.1: Tin Ore", 60, 1, 255, "");
-		oreGenLead = config.getBoolean("Generation", "0.2: Lead Ore", true, "");
-		oreSizeLead = config.getInt("Chunk Size", "0.2: Lead Ore", 7, 1, 100, "");
-		oreRarityLead = config.getInt("Gen Rate", "0.2: Lead Ore", 11, 1, 100, "");
-		oreMaxHeightLead = config.getInt("Max Height", "0.2: Lead Ore", 40, 1, 255, "");
-		oreGenSilver = config.getBoolean("Generation", "0.3: Silver Ore", true, "");
-		oreSizeSilver = config.getInt("Chunk Size", "0.3: Silver Ore", 7, 1, 100, "");
-		oreRaritySilver = config.getInt("Gen Rate", "0.3: Silver Ore", 10, 1, 100, "");
-		oreMaxHeightSilver = config.getInt("Max Height", "0.3: Silver Ore", 40, 1, 255, "");
-		oreGenUranium = config.getBoolean("Generation", "0.4: Uranium Ore", true, "");
-		oreSizeUranium = config.getInt("Chunk Size", "0.4: Uranium Ore", 10, 1, 100, "");
-		oreRarityUranium = config.getInt("Gen Rate", "0.4: Uranium Ore", 2, 1, 100, "");
-		oreMaxHeightUranium = config.getInt("Max Height", "0.4: Uranium Ore", 36, 1, 255, "");
-		oreGenThorium = config.getBoolean("Generation", "0.5: Thorium Ore", true, "");
-		oreSizeThorium = config.getInt("Chunk Size", "0.5: Thorium Ore", 7, 1, 100, "");
-		oreRarityThorium = config.getInt("Gen Rate", "0.5: Thorium Ore", 2, 1, 100, "");
-		oreMaxHeightThorium = config.getInt("Max Height", "0.5: Thorium Ore", 36, 1, 255, "");
-		oreGenLithium = config.getBoolean("Generation", "0.6: Lithium Ore", true, "");
-		oreSizeLithium = config.getInt("Chunk Size", "0.6: Lithium Ore", 7, 1, 100, "");
-		oreRarityLithium = config.getInt("Gen Rate", "0.6: Lithium Ore", 7, 1, 100, "");
-		oreMaxHeightLithium = config.getInt("Max Height", "0.6: Lithium Ore", 32, 1, 255, "");
-		oreGenBoron = config.getBoolean("Generation", "0.7: Boron Ore", true, "");
-		oreSizeBoron = config.getInt("Chunk Size", "0.7: Boron Ore", 7, 1, 100, "");
-		oreRarityBoron = config.getInt("Gen Rate", "0.7: Boron Ore", 7, 1, 100, "");
-		oreMaxHeightBoron = config.getInt("Max Height", "0.7: Boron Ore", 24, 1, 255, "");
-		oreGenMagnesium = config.getBoolean("Generation", "0.8: Magnesium Ore", true, "");
-		oreSizeMagnesium = config.getInt("Chunk Size", "0.8: Magnesium Ore", 7, 1, 100, "");
-		oreRarityMagnesium = config.getInt("Gen Rate", "0.8: Magnesium Ore", 7, 1, 100, "");
-		oreMaxHeightMagnesium = config.getInt("Max Height", "0.8: Magnesium Ore", 24, 1, 255, "");
-		oreGenPlutonium = config.getBoolean("Generation", "0.9: Plutonium Ore", true, "");
-		oreSizePlutonium = config.getInt("Chunk Size", "0.9: Plutonium Ore", 17, 1, 100, "");
-		oreRarityPlutonium = config.getInt("Gen Rate", "0.9: Plutonium Ore", 1, 1, 100, "");
-		oreMaxHeightPlutonium = config.getInt("Max Height", "0.9: Plutonium Ore", 255, 1, 255, "");
+		boiledEggRecipe = mainConfig.getBoolean("If disabled, the boiled egg recipe will be disabled", "!: [smelting an egg -> boiled version (this should fix recipe conflicts with food mods)]", true, "");
 		
-		liquidHeliumLakeGen = config.getInt("Liquid Helium Gen Rate in End", "0.10: World Gen", 0, 0, 10, "");
+		//Could conflict with other mods (for people who don't want to use minetweaker etc)?
+		if (boiledEggRecipe = false) {
+			GameRegistry.addSmelting(new ItemStack(Items.egg, 1), new ItemStack(NCItems.boiledEgg, 1), 0.1F);
+		} 
+		else {
+			return;
+		}
+		
+		oreGenCopper = mainConfig.getBoolean("Generation", "0.0: Copper Ore", true, "");
+		oreSizeCopper = mainConfig.getInt("Chunk Size", "0.0: Copper Ore", 8, 1, 100, "");
+		oreRarityCopper = mainConfig.getInt("Gen Rate", "0.0: Copper Ore", 12, 1, 100, "");
+		oreMaxHeightCopper = mainConfig.getInt("Max Height", "0.0: Copper Ore", 60, 1, 255, "");
+		oreGenTin = mainConfig.getBoolean("Generation", "0.1: Tin Ore", true, "");
+		oreSizeTin = mainConfig.getInt("Chunk Size", "0.1: Tin Ore", 8, 1, 100, "");
+		oreRarityTin = mainConfig.getInt("Gen Rate", "0.1: Tin Ore", 11, 1, 100, "");
+		oreMaxHeightTin = mainConfig.getInt("Max Height", "0.1: Tin Ore", 60, 1, 255, "");
+		oreGenLead = mainConfig.getBoolean("Generation", "0.2: Lead Ore", true, "");
+		oreSizeLead = mainConfig.getInt("Chunk Size", "0.2: Lead Ore", 7, 1, 100, "");
+		oreRarityLead = mainConfig.getInt("Gen Rate", "0.2: Lead Ore", 11, 1, 100, "");
+		oreMaxHeightLead = mainConfig.getInt("Max Height", "0.2: Lead Ore", 40, 1, 255, "");
+		oreGenSilver = mainConfig.getBoolean("Generation", "0.3: Silver Ore", true, "");
+		oreSizeSilver = mainConfig.getInt("Chunk Size", "0.3: Silver Ore", 7, 1, 100, "");
+		oreRaritySilver = mainConfig.getInt("Gen Rate", "0.3: Silver Ore", 10, 1, 100, "");
+		oreMaxHeightSilver = mainConfig.getInt("Max Height", "0.3: Silver Ore", 40, 1, 255, "");
+		oreGenUranium = mainConfig.getBoolean("Generation", "0.4: Uranium Ore", true, "");
+		oreSizeUranium = mainConfig.getInt("Chunk Size", "0.4: Uranium Ore", 10, 1, 100, "");
+		oreRarityUranium = mainConfig.getInt("Gen Rate", "0.4: Uranium Ore", 2, 1, 100, "");
+		oreMaxHeightUranium = mainConfig.getInt("Max Height", "0.4: Uranium Ore", 36, 1, 255, "");
+		oreGenThorium = mainConfig.getBoolean("Generation", "0.5: Thorium Ore", true, "");
+		oreSizeThorium = mainConfig.getInt("Chunk Size", "0.5: Thorium Ore", 7, 1, 100, "");
+		oreRarityThorium = mainConfig.getInt("Gen Rate", "0.5: Thorium Ore", 2, 1, 100, "");
+		oreMaxHeightThorium = mainConfig.getInt("Max Height", "0.5: Thorium Ore", 36, 1, 255, "");
+		oreGenLithium = mainConfig.getBoolean("Generation", "0.6: Lithium Ore", true, "");
+		oreSizeLithium = mainConfig.getInt("Chunk Size", "0.6: Lithium Ore", 7, 1, 100, "");
+		oreRarityLithium = mainConfig.getInt("Gen Rate", "0.6: Lithium Ore", 7, 1, 100, "");
+		oreMaxHeightLithium = mainConfig.getInt("Max Height", "0.6: Lithium Ore", 32, 1, 255, "");
+		oreGenBoron = mainConfig.getBoolean("Generation", "0.7: Boron Ore", true, "");
+		oreSizeBoron = mainConfig.getInt("Chunk Size", "0.7: Boron Ore", 7, 1, 100, "");
+		oreRarityBoron = mainConfig.getInt("Gen Rate", "0.7: Boron Ore", 7, 1, 100, "");
+		oreMaxHeightBoron = mainConfig.getInt("Max Height", "0.7: Boron Ore", 24, 1, 255, "");
+		oreGenMagnesium = mainConfig.getBoolean("Generation", "0.8: Magnesium Ore", true, "");
+		oreSizeMagnesium = mainConfig.getInt("Chunk Size", "0.8: Magnesium Ore", 7, 1, 100, "");
+		oreRarityMagnesium = mainConfig.getInt("Gen Rate", "0.8: Magnesium Ore", 7, 1, 100, "");
+		oreMaxHeightMagnesium = mainConfig.getInt("Max Height", "0.8: Magnesium Ore", 24, 1, 255, "");
+		oreGenPlutonium = mainConfig.getBoolean("Generation", "0.9: Plutonium Ore", true, "");
+		oreSizePlutonium = mainConfig.getInt("Chunk Size", "0.9: Plutonium Ore", 17, 1, 100, "");
+		oreRarityPlutonium = mainConfig.getInt("Gen Rate", "0.9: Plutonium Ore", 1, 1, 100, "");
+		oreMaxHeightPlutonium = mainConfig.getInt("Max Height", "0.9: Plutonium Ore", 255, 1, 255, "");
+		
+		liquidHeliumLakeGen = mainConfig.getInt("Liquid Helium Gen Rate in End", "0.10: World Gen", 0, 0, 10, "");
 
-		electricCrusherCrushSpeed = config.getInt("Electic Crusher Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		electricCrusherCrushEfficiency = config.getInt("Electic Crusher Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		electricFurnaceSmeltSpeed = config.getInt("Electic Furnace Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		electricFurnaceSmeltEfficiency = config.getInt("Electic Furnace Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		separatorSpeed = config.getInt("Isotope Separator Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		separatorEfficiency = config.getInt("Isotope Separator Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		hastenerSpeed = config.getInt("Decay Hastener Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		hastenerEfficiency = config.getInt("Decay Hastener Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		electrolyserSpeed = config.getInt("Electrolyser Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		electrolyserEfficiency = config.getInt("Electrolyser Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		oxidiserSpeed = config.getInt("Oxidiser Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		oxidiserEfficiency = config.getInt("Oxidiser Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		ioniserSpeed = config.getInt("Ioniser Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		ioniserEfficiency = config.getInt("Ioniser Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		irradiatorSpeed = config.getInt("Neutron Irradiator Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		irradiatorEfficiency = config.getInt("Neutron Irradiator Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		coolerSpeed = config.getInt("Supercooler Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		coolerEfficiency = config.getInt("Supercooler Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		factorySpeed = config.getInt("Manufactory Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		factoryEfficiency = config.getInt("Manufactory Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		heliumExtractorSpeed = config.getInt("Helium Extractor Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		heliumExtractorEfficiency = config.getInt("Helium Extractor Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		assemblerSpeed = config.getInt("Assembler Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		assemblerEfficiency = config.getInt("Assembler Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		recyclerSpeed = config.getInt("Fuel Recycler Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		recyclerEfficiency = config.getInt("Fuel Recycler Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
-		reactionGeneratorRF = config.getInt("Reaction Generator RF/t", "1.1: RF Generators", 100, 10, 1000, "");
-		reactionGeneratorEfficiency = config.getInt("Reaction Generator Efficiency Multiplier", "1.1: RF Generators", 100, 10, 1000, "");
-		RTGRF = config.getInt("Plutonium RTG RF/t", "1.1: RF Generators", 100, 1, 1000, "");
-		AmRTGRF = config.getInt("Americium RTG RF/t", "1.1: RF Generators", 40, 1, 1000, "");
-		CfRTGRF = config.getInt("Californium RTG RF/t", "1.1: RF Generators", 500, 1, 1000, "");
-		WRTGRF = config.getInt("WRTG RF/t", "1.1: RF Generators", 5, 1, 1000, "");
-		solarRF = config.getInt("Solar Panel RF/t", "1.1: RF Generators", 10, 1, 1000, "");
-		nuclearFurnaceCookSpeed = config.getInt("Nuclear Furnace Speed Multiplier", "1.2: Non-RF Machines", 100, 10, 1000, "");
-		nuclearFurnaceCookEfficiency = config.getInt("Nuclear Furnace Fuel Usage Multiplier", "1.2: Non-RF Machines", 100, 10, 1000, "");
-		metalFurnaceCookSpeed = config.getInt("Metal Furnace Speed Multiplier", "1.2: Non-RF Machines", 100, 10, 1000, "");
-		metalFurnaceCookEfficiency = config.getInt("Metal Furnace Fuel Usage Multiplier", "1.2: Non-RF Machines", 100, 10, 1000, "");
-		crusherCrushSpeed = config.getInt("Crusher Speed Multiplier", "1.2: Non-RF Machines", 100, 10, 1000, "");
-		crusherCrushEfficiency = config.getInt("Crusher Fuel Usage Multiplier", "1.2: Non-RF Machines", 100, 10, 1000, "");
-		collectorSpeed = config.getInt("Helium Collector Speed Multiplier", "1.2: Non-RF Machines", 100, 10, 1000, "");
-		lithiumIonRF = config.getInt("Lithium Ion Battery RF", "1.3: RF Storage", 10000000, 1, 100000000, "");
-		voltaicPileRF = config.getInt("Voltaic Pile RF", "1.3: RF Storage", 1000000, 1, 100000000, "");
+		electricCrusherCrushSpeed = mainConfig.getInt("Electic Crusher Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		electricCrusherCrushEfficiency = mainConfig.getInt("Electic Crusher Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		electricFurnaceSmeltSpeed = mainConfig.getInt("Electic Furnace Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		electricFurnaceSmeltEfficiency = mainConfig.getInt("Electic Furnace Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		separatorSpeed = mainConfig.getInt("Isotope Separator Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		separatorEfficiency = mainConfig.getInt("Isotope Separator Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		hastenerSpeed = mainConfig.getInt("Decay Hastener Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		hastenerEfficiency = mainConfig.getInt("Decay Hastener Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		electrolyserSpeed = mainConfig.getInt("Electrolyser Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		electrolyserEfficiency = mainConfig.getInt("Electrolyser Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		oxidiserSpeed = mainConfig.getInt("Oxidiser Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		oxidiserEfficiency = mainConfig.getInt("Oxidiser Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		ioniserSpeed = mainConfig.getInt("Ioniser Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		ioniserEfficiency = mainConfig.getInt("Ioniser Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		irradiatorSpeed = mainConfig.getInt("Neutron Irradiator Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		irradiatorEfficiency = mainConfig.getInt("Neutron Irradiator Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		coolerSpeed = mainConfig.getInt("Supercooler Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		coolerEfficiency = mainConfig.getInt("Supercooler Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		factorySpeed = mainConfig.getInt("Manufactory Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		factoryEfficiency = mainConfig.getInt("Manufactory Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		heliumExtractorSpeed = mainConfig.getInt("Helium Extractor Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		heliumExtractorEfficiency = mainConfig.getInt("Helium Extractor Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		assemblerSpeed = mainConfig.getInt("Assembler Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		assemblerEfficiency = mainConfig.getInt("Assembler Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		recyclerSpeed = mainConfig.getInt("Fuel Recycler Speed Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		recyclerEfficiency = mainConfig.getInt("Fuel Recycler Efficiency Multiplier", "1.0: RF Machines", 100, 10, 1000, "");
+		reactionGeneratorRF = mainConfig.getInt("Reaction Generator RF/t", "1.1: RF Generators", 100, 10, 1000, "");
+		reactionGeneratorEfficiency = mainConfig.getInt("Reaction Generator Efficiency Multiplier", "1.1: RF Generators", 100, 10, 1000, "");
+		RTGRF = mainConfig.getInt("Plutonium RTG RF/t", "1.1: RF Generators", 100, 1, 1000, "");
+		AmRTGRF = mainConfig.getInt("Americium RTG RF/t", "1.1: RF Generators", 40, 1, 1000, "");
+		CfRTGRF = mainConfig.getInt("Californium RTG RF/t", "1.1: RF Generators", 500, 1, 1000, "");
+		WRTGRF = mainConfig.getInt("WRTG RF/t", "1.1: RF Generators", 5, 1, 1000, "");
+		solarRF = mainConfig.getInt("Solar Panel RF/t", "1.1: RF Generators", 10, 1, 1000, "");
+		nuclearFurnaceCookSpeed = mainConfig.getInt("Nuclear Furnace Speed Multiplier", "1.2: Non-RF Machines", 100, 10, 1000, "");
+		nuclearFurnaceCookEfficiency = mainConfig.getInt("Nuclear Furnace Fuel Usage Multiplier", "1.2: Non-RF Machines", 100, 10, 1000, "");
+		metalFurnaceCookSpeed = mainConfig.getInt("Metal Furnace Speed Multiplier", "1.2: Non-RF Machines", 100, 10, 1000, "");
+		metalFurnaceCookEfficiency = mainConfig.getInt("Metal Furnace Fuel Usage Multiplier", "1.2: Non-RF Machines", 100, 10, 1000, "");
+		crusherCrushSpeed = mainConfig.getInt("Crusher Speed Multiplier", "1.2: Non-RF Machines", 100, 10, 1000, "");
+		crusherCrushEfficiency = mainConfig.getInt("Crusher Fuel Usage Multiplier", "1.2: Non-RF Machines", 100, 10, 1000, "");
+		collectorSpeed = mainConfig.getInt("Helium Collector Speed Multiplier", "1.2: Non-RF Machines", 100, 10, 1000, "");
+		lithiumIonRF = mainConfig.getInt("Lithium Ion Battery RF", "1.3: RF Storage", 10000000, 1, 100000000, "");
+		voltaicPileRF = mainConfig.getInt("Voltaic Pile RF", "1.3: RF Storage", 1000000, 1, 100000000, "");
 		
-		steamDecompressRate = config.getInt("Steam Decompressor Rate", "1.4: Steam Manipulators", 2, 1, 100, "");
-		steamRFUsageRate = config.getInt("Steam Generator Usage Rate", "1.4: Steam Manipulators", 2000, 1, 100000, "");
+		steamDecompressRate = mainConfig.getInt("Steam Decompressor Rate", "1.4: Steam Manipulators", 2, 1, 100, "");
+		steamRFUsageRate = mainConfig.getInt("Steam Generator Usage Rate", "1.4: Steam Manipulators", 2000, 1, 100000, "");
 		
-		explosionRadius = config.getInt("General Explosion Radius Modifier", "1.5: Explosions", 100, 10, 1000, "");
+		explosionRadius = mainConfig.getInt("General Explosion Radius Modifier", "1.5: Explosions", 100, 10, 1000, "");
 		
-		enableNuclearMonster = config.getBoolean("Enable Nuclear Monsters Spawning", "2.0: Mobs", true, "");
-		enablePaul = config.getBoolean("Enable Paul", "2.0: Mobs", true, "");
-		enableBrian = config.getBoolean("Enable Brian", "2.0: Mobs", true, "");
-		enableNukes = config.getBoolean("Enable Nuclear and Antimatter Weapons", "2.1: Other", true, "");
-		enableEMP = config.getBoolean("Enable EMP Weapon", "2.1: Other", true, "");
-		enableLoot = config.getBoolean("Enable Loot in Generated Chests", "2.1: Other", true, "");
-		lootModifier = config.getInt("Dungeon Loot Frequency", "2.1: Other", 2, 0, 10, "");
-		extraDrops = config.getBoolean("Enable Extra Mob and Ore Drops", "2.1: Other", true, "");
+		enableNuclearMonster = mainConfig.getBoolean("Enable Nuclear Monsters Spawning", "2.0: Mobs", true, "");
+		enablePaul = mainConfig.getBoolean("Enable Paul", "2.0: Mobs", true, "");
+		enableBrian = mainConfig.getBoolean("Enable Brian", "2.0: Mobs", true, "");
+		enableNukes = mainConfig.getBoolean("Enable Nuclear and Antimatter Weapons", "2.1: Other", true, "");
+		enableEMP = mainConfig.getBoolean("Enable EMP Weapon", "2.1: Other", true, "");
+		enableLoot = mainConfig.getBoolean("Enable Loot in Generated Chests", "2.1: Other", true, "");
+		lootModifier = mainConfig.getInt("Dungeon Loot Frequency", "2.1: Other", 2, 0, 10, "");
+		extraDrops = mainConfig.getBoolean("Enable Extra Mob and Ore Drops", "2.1: Other", true, "");
 		
 		fissionUpdateRate = fissionConfig.getInt("Number of ticks per update of Fission Reactors", "!: Update Rate", 20, 1, 1000, "");
 		fissionComparatorHeat = fissionConfig.getInt("The heat at which the comparator will emit a full redstone signal", "!: Comparator Heat", 250000, 1, 1000000, "");
@@ -1043,11 +1060,12 @@ public class NuclearCraft {
 		boronSpeed = toolConfig.getInt("Boron Speed", "5: Boron", 8, 1, 50, "");
 		boronDamage = toolConfig.getInt("Boron Damage", "5: Boron", 3, 0, 25, "");
 		
-		config.save();
+		mainConfig.save();
 		fissionConfig.save();
 		fusionConfig.save();
 		acceleratorConfig.save();
 		toolConfig.save();
+		mobConfig.save();
 		
 		// Recipes
 		/*RecipeSorter.register("nuclearcraft:workspaceshaped", NuclearWorkspaceShapedOreRecipe.class, Category.SHAPED, "after:minecraft:shaped");
@@ -1881,9 +1899,7 @@ public class NuclearCraft {
 		GameRegistry.addSmelting(new ItemStack(NCItems.material, 1, 72), new ItemStack(NCItems.material, 1, 71), 0.0F);
 		GameRegistry.addSmelting(new ItemStack(NCItems.material, 1, 77), new ItemStack(NCItems.material, 1, 76), 0.0F);
 		GameRegistry.addSmelting(new ItemStack(NCItems.material, 1, 79), new ItemStack(NCItems.material, 1, 78), 0.0F);
-		GameRegistry.addSmelting(new ItemStack(NCItems.material, 1, 81), new ItemStack(NCItems.material, 1, 80), 0.0F);
-		
-		GameRegistry.addSmelting(new ItemStack(Items.egg, 1), new ItemStack(NCItems.boiledEgg, 1), 0.1F);
+		GameRegistry.addSmelting(new ItemStack(NCItems.material, 1, 81), new ItemStack(NCItems.material, 1, 80), 0.0F);	
 		
 		s(NCItems.fuel, 51, 0);
 		s(NCItems.fuel, 52, 1);
