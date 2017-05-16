@@ -84,7 +84,7 @@ public class ListUtils
 			return toReturn;
 		}
 		else {
-			//List<V> inverse = inverse(list);
+			List<V> inverse = inverse(list);
 
 			int iterNeeded = list.size() - cap;
 			int count = 0;
